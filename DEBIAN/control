@@ -1,0 +1,7 @@
+Package: servefile
+Version: 1.0.0
+Architecture: all
+Maintainer: Adhi <adhiyman.b@outlook.com>
+Depends: bash
+Description: Python & Apache server dashboard with Ngrok.
+ A simple tool to start a Python server and expose it to the internet with Ngrok.
