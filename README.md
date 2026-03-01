@@ -56,7 +56,7 @@ If you'd prefer to install manually, follow these steps:
 1. **Clone the repository**:
 
    ```bash
-   git clone https://github.com/yourusername/servefile.git
+   git clone https://github.com/Adhhiiiiiiii/servefile.git
    cd servefile
    ```
 
