@@ -29,7 +29,7 @@ You can install **Ngrok** from [ngrok.com](https://ngrok.com/download).
 
 ### Option 1: Download and Install the `.deb` Package
 
-1. **Download the `.deb` package** from the [releases page](https://github.com/yourusername/servefile/releases).
+1. **Download the `.deb` package** from the [releases page](https://github.com/Adhhiiiiiiii/servefile/releases).
 
 2. **Install the package** using `dpkg`:
 
