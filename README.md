@@ -63,7 +63,7 @@ If you'd prefer to install manually, follow these steps:
 2. **Make the script executable**:
 
    ```bash
-   chmod +x servefile.sh
+   chmod +x /usr/local/bin/servefile
    ```
 
 3. **Move the script to a global location** (e.g., `/usr/local/bin`):
