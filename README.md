@@ -1,4 +1,4 @@
-# ServeFile - Python & Apache Server Dashboard with Ngrok
+# ServeFile - Python Server Dashboard with Ngrok
 
 `ServeFile` is a simple command-line tool that allows you to quickly set up a Python HTTP server, optionally expose it to the internet using Ngrok, and manage active ports. It’s designed to be easy to use and lightweight, ideal for quick file sharing or development environments.
 
@@ -88,7 +88,7 @@ After installation, you can start the Python HTTP server using the `servefile` c
 
 Run the following command:
 
-```bash
+```bash id="zqsd7m"
 servefile
 ```
 
@@ -121,12 +121,12 @@ You can manage active ports with the **Kill Ports Menu**:
 
 ## Example
 
-```bash
+```bash id="era50r"
 $ servefile
 ┏━┓┏━╸┏━┓╻ ╻┏━╸┏━╸╻╻  ┏━╸
 ┗━┓┣╸ ┣┳┛┃┏┛┣╸ ┣╸ ┃┃  ┣╸ 
 ┗━┛┗━╸╹┗╸┗┛ ┗━╸╹  ╹┗━╸┗━╸
-ServeFile - Python & Apache Server Dashboard with Ngrok
+ServeFile - Python Server Dashboard with Ngrok
 Created by Adhi | GitHub: https://github.com/yourusername
 
 Select mode:
@@ -143,7 +143,7 @@ Select mode (default 2):
 
 To uninstall `ServeFile`, run:
 
-```bash
+```bash id="79ajx0"
 sudo dpkg -r servefile
 ```
 
@@ -161,5 +161,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 * **Ngrok Not Installed**: If you select "LAN + Ngrok" but don't have Ngrok installed, the script will notify you and provide instructions on how to install it.
 * **Python Version**: The script uses Python 3, so make sure that `python3` is installed.
-
----
