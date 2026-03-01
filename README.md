@@ -9,8 +9,6 @@
 * **Active Port Management**: List and kill active ports directly from the menu.
 * **Simple & Interactive**: Easy-to-use interactive command-line interface.
 
----
-
 ## Prerequisites
 
 Before using `ServeFile`, you need to have the following installed:
@@ -21,7 +19,6 @@ Before using `ServeFile`, you need to have the following installed:
 
 You can install **Ngrok** from [ngrok.com](https://ngrok.com/download).
 
----
 
 ## Installation
 
@@ -76,7 +73,6 @@ If you'd prefer to install manually, follow these steps:
    servefile
    ```
 
----
 
 ## Usage
 
@@ -105,7 +101,6 @@ You will be asked to choose a port for the server. You can enter a custom port o
 
 If you choose **LAN + Ngrok**, Ngrok will be used to expose your server to the public internet. The public URL will be displayed once the server is started. You can also open this URL directly in your browser.
 
----
 
 ## Active Port Management
 
@@ -115,7 +110,6 @@ You can manage active ports with the **Kill Ports Menu**:
 2. **Kill All Active Ports**: Kill all active listening ports (use with caution).
 3. **Kill Specific Ports**: You can choose to kill specific ports if needed.
 
----
 
 ## Example
 
@@ -135,7 +129,6 @@ Select mode:
 Select mode (default 2):
 ```
 
----
 
 ## Uninstall
 
@@ -147,9 +140,7 @@ sudo dpkg -r servefile
 
 This will remove the package from your system.
 
----
-
-### Notes
+### Note
 
 * **Ngrok Not Installed**: If you select "LAN + Ngrok" but don't have Ngrok installed, the script will notify you and provide instructions on how to install it.
 * **Python Version**: The script uses Python 3, so make sure that `python3` is installed.
