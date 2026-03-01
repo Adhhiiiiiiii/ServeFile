@@ -151,12 +151,6 @@ This will remove the package from your system.
 
 ---
 
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
 ### Notes
 
 * **Ngrok Not Installed**: If you select "LAN + Ngrok" but don't have Ngrok installed, the script will notify you and provide instructions on how to install it.
