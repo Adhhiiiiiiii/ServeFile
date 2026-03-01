@@ -2,8 +2,6 @@
 
 `ServeFile` is a simple command-line tool that allows you to quickly set up a Python HTTP server, optionally expose it to the internet using Ngrok, and manage active ports. It’s designed to be easy to use and lightweight, ideal for quick file sharing or development environments.
 
----
-
 ## Features
 
 * **LAN-Only Mode**: Start a Python server accessible only on your local network.
