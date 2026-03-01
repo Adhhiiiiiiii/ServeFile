@@ -1,0 +1,244 @@
+#!/bin/bash
+
+# ===================== COLORS =====================
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[0;33m'
+CYAN='\033[0;36m'
+BOLD='\033[1m'
+RESET='\033[0m'
+MAGENTA='\033[0;35m'
+
+LAST_PORT_FILE="$HOME/.server_last_port"
+
+# ===================== CLEAR SCREEN & HEADER =====================
+clear_screen() {
+    clear
+}
+
+display_header() {
+    echo -e "${BOLD}${CYAN}"
+    echo "┏━┓┏━╸┏━┓╻ ╻┏━╸┏━╸╻╻  ┏━╸"
+    echo "┗━┓┣╸ ┣┳┛┃┏┛┣╸ ┣╸ ┃┃  ┣╸ "
+    echo "┗━┛┗━╸╹┗╸┗┛ ┗━╸╹  ╹┗━╸┗━╸"
+    echo -e "${YELLOW}ServeFile - Python Server Dashboard with Ngrok${RESET}${CYAN}"
+    echo -e "${GREEN}Created by Adhi | GitHub: https://github.com/Adhhiiiiiiii${RESET}${CYAN}"
+    echo -e "${RESET}"
+}
+
+# ===================== ACTIVE PORTS =====================
+display_active_ports() {
+    echo -e "${BOLD}${CYAN}Active Ports:${RESET}"
+    echo -e "PID    PROCESS     PORT"
+    PORT_LIST=$(lsof -i -P -n | grep LISTEN | awk '{printf "%-7s %-10s %s\n", $2, $1, $9}' | sort -k3 -n)
+    if [[ -z "$PORT_LIST" ]]; then
+        echo -e "${GREEN}No active listening ports.${RESET}"
+    else
+        while IFS= read -r line; do
+            PORT=$(echo $line | awk '{print $3}' | awk -F':' '{print $2}')
+            if [[ -n "$PORT" ]]; then
+                echo -e "${RED}$line${RESET}"
+            else
+                echo -e "${GREEN}$line${RESET}"
+            fi
+        done <<< "$PORT_LIST"
+    fi
+    echo ""
+}
+
+# ===================== KILL PORTS MENU =====================
+kill_ports_menu() {
+    clear_screen  # Clear the screen when entering the kill ports menu
+    display_header  # Show the header again for the kill ports menu
+
+    echo -e "${BOLD}${YELLOW}Kill Ports Menu:${RESET}"
+    echo -e "1 - Kill ALL active ports"
+    echo -e "2 - Kill specific port(s)"
+    echo -e "3 - Go to Main Menu"  # Added option to return to Main Menu
+    echo ""
+    read -p "Select an option: " SUBCHOICE
+    case $SUBCHOICE in
+        1)
+            read -p "Are you sure you want to kill ALL active ports? (y/n): " CONFIRM
+            if [[ "$CONFIRM" =~ ^[Yy]$ ]]; then
+                PIDS=$(lsof -ti -sTCP:LISTEN)
+                if [[ -z "$PIDS" ]]; then
+                    echo -e "${GREEN}No active listening ports found.${RESET}"
+                else
+                    kill -9 $PIDS
+                    echo -e "${GREEN}All active ports killed.${RESET}"
+                fi
+            else
+                echo -e "${YELLOW}Cancelled killing all ports.${RESET}"
+            fi
+            ;;
+        2)
+            read -p "Enter port numbers to kill (space-separated): " PORTS
+            for PORT in $PORTS; do
+                PIDS=$(lsof -ti:$PORT)
+                if [[ -n "$PIDS" ]]; then
+                    echo -e "${RED}Killing process(es) on port $PORT: $PIDS${RESET}"
+                    kill -9 $PIDS
+                    echo -e "${GREEN}Port $PORT is now free.${RESET}"
+                else
+                    echo -e "${YELLOW}Port $PORT is not in use.${RESET}"
+                fi
+            done
+            ;;
+        3)
+            main_menu  # Go back to the main menu
+            return
+            ;;
+        *)
+            echo -e "${RED}Invalid option.${RESET}"
+            ;;
+    esac
+}
+
+# ===================== LAST PORT =====================
+get_last_port() {
+    if [[ -f "$LAST_PORT_FILE" ]]; then
+        LAST_PORT=$(cat "$LAST_PORT_FILE")
+        if ! lsof -i:$LAST_PORT &> /dev/null; then
+            echo "$LAST_PORT"
+            return
+        fi
+    fi
+    echo "5000"
+}
+
+save_last_port() {
+    echo "$1" > "$LAST_PORT_FILE"
+}
+
+# ===================== VALIDATE PORT =====================
+validate_port() {
+    if ! [[ "$1" =~ ^[0-9]+$ ]] || [ "$1" -lt 1024 ] || [ "$1" -gt 65535 ]; then
+        echo -e "${RED}Invalid port. Please enter a port between 1024-65535.${RESET}"
+        return 1
+    fi
+    if [[ "$1" -lt 1024 ]]; then
+        echo -e "${RED}Port numbers below 1024 are reserved for system use. Choose a different port.${RESET}"
+        return 1
+    fi
+    return 0
+}
+
+# ===================== START SERVER =====================
+start_python_server() {
+    clear_screen  # Clear screen when entering the submenu
+    display_header
+
+    echo -e "Select mode:"
+    echo -e "1 - LAN Only"
+    echo -e "2 - LAN + Ngrok (Public)"
+    echo -e "3 - Go to Main Menu"  # Added option to go back to Main Menu
+    echo ""
+    read -p "Select mode (default 2): " MODE
+    MODE=${MODE:-2}
+
+    # If the user chooses option 3, return to the main menu
+    if [[ "$MODE" -eq 3 ]]; then
+        main_menu
+        return
+    fi
+
+    # Prompt for port after selecting mode
+    DEFAULT_PORT=$(get_last_port)
+    while true; do
+        read -p "Enter port (default $DEFAULT_PORT): " PORT
+        PORT=${PORT:-$DEFAULT_PORT}
+
+        if validate_port "$PORT"; then
+            break
+        fi
+    done
+
+    if lsof -i:$PORT &> /dev/null; then
+        echo -e "${RED}Port $PORT is busy. Remove it first.${RESET}"
+        return
+    fi
+
+    python3 -m http.server $PORT --bind 0.0.0.0 &
+    SERVER_PID=$!
+
+    LAN_IP=$(hostname -I | awk '{print $1}')
+    echo -e "${GREEN}LAN URL: http://$LAN_IP:$PORT${RESET}"
+
+    NGROK_PID=""
+    if [ "$MODE" -eq 2 ]; then
+        if ! command -v ngrok &> /dev/null; then
+            echo -e "${RED}Ngrok not installed. Install Ngrok for public URL. Visit: https://ngrok.com/download.${RESET}"
+            return
+        else
+            ngrok http $PORT > /dev/null &
+            NGROK_PID=$!
+            sleep 3
+            NGROK_URL=$(curl -s http://127.0.0.1:4040/api/tunnels | grep -oP '"public_url":"\K[^"]+')
+            if [[ -n "$NGROK_URL" ]]; then
+                echo -e "${GREEN}Ngrok public URL: $NGROK_URL${RESET}"
+                if [[ "$OSTYPE" == "linux-gnu"* ]]; then
+                    xdg-open $NGROK_URL
+                elif [[ "$OSTYPE" == "darwin"* ]]; then
+                    open $NGROK_URL
+                fi
+            else
+                echo -e "${RED}Ngrok URL not found. Please check Ngrok logs for issues.${RESET}"
+            fi
+        fi
+    fi
+
+    save_last_port $PORT
+
+    # Handle Ctrl+C: kill server and ngrok if running
+    trap 'echo -e "\n${YELLOW}Stopping server...${RESET}"; kill $SERVER_PID; [ -n "$NGROK_PID" ] && kill $NGROK_PID; exit' INT
+
+    wait $SERVER_PID
+
+    # After the server stops, return to the main menu
+    main_menu
+}
+
+# ===================== MAIN MENU =====================
+main_menu() {
+    while true; do
+        clear_screen
+        display_header
+        display_active_ports
+        echo -e "${BOLD}${GREEN}Menu:${RESET}"
+        echo -e "1 - Start Server"
+        echo -e "2 - Kill Ports Menu"
+        echo -e "3 - Exit"
+        echo ""
+        read -p "Select an option: " CHOICE
+        case $CHOICE in
+            1) start_python_server ;;
+            2) kill_ports_menu ;;
+            3) echo -e "${GREEN}Exiting...${RESET}"; exit 0 ;;
+            *) echo -e "${RED}Invalid choice${RESET}" ;;
+        esac
+        sleep 1
+    done
+}
+
+# ===================== DEPENDENCY CHECK =====================
+check_dependencies() {
+    if ! command -v python3 &> /dev/null; then
+        echo -e "${RED}Error: Python3 is required. Please install Python3.${RESET}"
+        echo -e "Visit: https://www.python.org/downloads/"
+        exit 1
+    fi
+    if ! command -v curl &> /dev/null; then
+        echo -e "${RED}Error: curl is required for fetching Ngrok URL.${RESET}"
+        echo -e "Install curl: https://curl.se/download.html"
+        exit 1
+    fi
+    if ! command -v ngrok &> /dev/null; then
+        echo -e "${RED}Error: Ngrok is required for public URL functionality.${RESET}"
+        echo -e "Install Ngrok: https://ngrok.com/download"
+        exit 1
+    fi
+}
+
+check_dependencies
+main_menu
