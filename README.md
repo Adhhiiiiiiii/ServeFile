@@ -24,21 +24,25 @@ You can install **Ngrok** from [ngrok.com](https://ngrok.com/download).
 
 ### Option 1: Download and Install the `.deb` Package
 
-1. **Download the `.deb` package** from the [releases page](https://github.com/Adhhiiiiiiii/servefile/releases).
+1. **Download the `.deb` package** from the [releases page](https://github.com/Adhhiiiiiiii/servefile/releases) or use this CMD
 
-2. **Install the package** using `dpkg`:
+   ```bash
+   curl -O https://github.com/Adhhiiiiiiii/ServeFile/releases/download/v1.0.0/servefile-package.deb
+   ```
+
+3. **Install the package** using `dpkg`:
 
    ```bash
    sudo dpkg -i servefile-package.deb
    ```
 
-3. **Fix any missing dependencies** (if required):
+4. **Fix any missing dependencies** (if required):
 
    ```bash
    sudo apt-get install -f
    ```
 
-4. After installation, you can run `servefile` from anywhere on your system:
+5. After installation, you can run `servefile` from anywhere on your system:
 
    ```bash
    servefile
